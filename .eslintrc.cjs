@@ -34,6 +34,7 @@ module.exports = {
     ],
 
     rules: {
+        'no-use-before-define': 'off',
         semi: 'off',
         'comma-dangle': 'off',
         'no-undef': 'off',

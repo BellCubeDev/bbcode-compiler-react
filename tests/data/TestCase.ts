@@ -1,7 +1,7 @@
 export type ValidationTestCase = {
     name: string
     input: string
-    expectedOutputs: Array<string>
+    expectedOutput: string
 }
 
 export type XssTestCase = {

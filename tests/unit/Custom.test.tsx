@@ -1,13 +1,16 @@
 import { describe, test, expect } from 'vitest'
-import { Generator, getTagImmediateText, Transform, Lexer, getWidthHeightAttr, Parser, stringifyTokens, AstNodeType } from '@/index.js'
+import { Generator, Transform, Lexer, getWidthHeightAttr, Parser, stringifyTokens, AstNodeType } from '@/index.js'
+import React from 'react';
+import { renderToString } from 'react-dom/server';
 
 const input = '[youtube]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/youtube]'
 const customTransforms: Array<Transform> = [
     {
         name: 'youtube',
         skipChildren: true,
-        start: (tagNode) => {
-            const src = getTagImmediateText(tagNode)
+
+        component({ tagNode }) {
+            const src = tagNode.getTagImmediateText()
             if (!src) {
                 return false
             }
@@ -20,17 +23,15 @@ const customTransforms: Array<Transform> = [
             const videoId = matches[1]
             const { width, height } = getWidthHeightAttr(tagNode)
 
-            return `
-                <iframe
-                    width="${width ?? 560}"
-                    height="${height ?? 315}"
-                    src="https://www.youtube.com/embed/${videoId}"
-                    title="YouTube Video Player"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                ></iframe>
-            `
+            return <iframe
+                width={width ?? 560}
+                height={height ?? 315}
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title="YouTube Video Player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+            />
         },
     },
 ]
@@ -63,19 +64,9 @@ describe('Custom', () => {
         test('generates correct html', () => {
             const tokens = new Lexer().tokenize(input)
             const root = new Parser(customTransforms).parse(input, tokens)
-            const output = new Generator(customTransforms).generate(root)
+            const output = renderToString(new Generator(customTransforms).generate(root))
 
-            expect(output).toBe(`
-                <iframe
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                    title="YouTube Video Player"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                ></iframe>
-            `)
+            expect(output).toBe(`<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube Video Player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>`)
         })
     })
 })

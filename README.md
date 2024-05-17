@@ -1,32 +1,35 @@
-# BBCode Compiler
+# BBCode Compiler - React
 
-This is a fast BBCode parser and HTML generator with TypeScript support.
+A fast BBCode parser and React generator with TypeScript support. Forked from [Trinovantes/bbcode-compiler](https://github.com/Trinovantes/bbcode-compiler).
 
-**Note:** This package is only available in ESM format.
+**Note:** This package is a [Pure ESM package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
 
 ## Usage
 
 ```ts
-import { generateHtml } from 'bbcode-compiler'
+import { generateReact } from 'bbcode-compiler-react'
 
-// <strong>Hello World</strong>
-const html = generateHtml('[b]Hello World[/b]')
+// React: <b>Hello World</b>
+const react = generateReact('[b]Hello World[/b]')
 ```
 
 ## Extending With Custom Tags
 
-```ts
-import { generateHtml, getTagImmediateText, htmlTransforms, getWidthHeightAttr } from 'bbcode-compiler'
+```tsx
+import { generateReact, defaultTransforms, getWidthHeightAttr } from 'bbcode-compiler-react'
 
-const customTransforms: typeof htmlTransforms = [
+const customTransforms: typeof defaultTransforms = [
     // Default tags included with this package
-    ...htmlTransforms,
+    ...defaultTransforms,
 
     // You can override a default tag by including it after the original in the transforms array
     {
         name: 'b',
-        start: () => '<b>',
-        end: () => '</b>',
+        component({ tagNode, children }) {
+            return <b>
+                {children}
+            </b>
+        }
     },
 
     // Create new tag
@@ -35,8 +38,8 @@ const customTransforms: typeof htmlTransforms = [
     {
         name: 'youtube',
         skipChildren: true, // Do not actually render the "https://www.youtube.com/watch?v=dQw4w9WgXcQ" text
-        start: (tagNode) => {
-            const src = getTagImmediateText(tagNode)
+        component({ tagNode, children }) {
+            const src = tagNode.getTagImmediateText()
             if (!src) {
                 return false
             }
@@ -49,17 +52,15 @@ const customTransforms: typeof htmlTransforms = [
             const videoId = matches[1]
             const { width, height } = getWidthHeightAttr(tagNode)
 
-            return `
-                <iframe
-                    width="${width ?? 560}"
-                    height="${height ?? 315}"
-                    src="https://www.youtube.com/embed/${videoId}"
-                    title="YouTube Video Player"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                ></iframe>
-            `
+            return <iframe
+                width={width ?? 560}
+                height={height ?? 315}
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title="YouTube Video Player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+            />
         },
     },
 ]
@@ -69,9 +70,9 @@ const customTransforms: typeof htmlTransforms = [
 //     height="315"
 //     src="https://www.youtube.com/embed/dQw4w9WgXcQ"
 //     title="YouTube Video Player"
-//     frameborder="0"
+//     frameBorder="0"
 //     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-//     allowfullscreen
+//     allowFullScreen
 // ></iframe>
-const html = generateHtml('[youtube]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/youtube]', customTransforms)
+const html = generateReact('[youtube]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/youtube]', customTransforms)
 ```

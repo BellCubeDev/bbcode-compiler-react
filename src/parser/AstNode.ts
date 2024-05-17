@@ -61,7 +61,7 @@ export function nodeTypeToString(nodeType: AstNodeType): string {
     }
 }
 
-export abstract class AstNode {
+export abstract class AstNodeBase {
     readonly abstract nodeType: AstNodeType
 
     // eslint-disable-next-line no-use-before-define
@@ -106,7 +106,7 @@ export abstract class AstNode {
 // Root
 // ----------------------------------------------------------------------------
 
-export class RootNode extends AstNode {
+export class RootNode extends AstNodeBase {
     readonly nodeType = AstNodeType.RootNode
 
     override isValid(): boolean {
@@ -126,7 +126,7 @@ export class RootNode extends AstNode {
 // Text
 // ----------------------------------------------------------------------------
 
-export class TextNode extends AstNode {
+export class TextNode extends AstNodeBase {
     readonly nodeType = AstNodeType.TextNode
     readonly str: string
 
@@ -144,7 +144,7 @@ export class TextNode extends AstNode {
     }
 }
 
-export class LinebreakNode extends AstNode {
+export class LinebreakNode extends AstNodeBase {
     readonly nodeType = AstNodeType.LinebreakNode
 
     override toShortString(): string {
@@ -156,7 +156,7 @@ export class LinebreakNode extends AstNode {
 // Tag
 // ----------------------------------------------------------------------------
 
-export class StartTagNode extends AstNode {
+export class StartTagNode extends AstNodeBase {
     readonly nodeType = AstNodeType.StartTagNode
     readonly tagName: string
     readonly ogTag: string
@@ -182,7 +182,7 @@ export class StartTagNode extends AstNode {
     }
 }
 
-export class EndTagNode extends AstNode {
+export class EndTagNode extends AstNodeBase {
     readonly nodeType = AstNodeType.EndTagNode
     readonly tagName: string
     readonly ogTag: string
@@ -202,7 +202,7 @@ export class EndTagNode extends AstNode {
     }
 }
 
-export class TagNode extends AstNode {
+export class TagNode extends AstNodeBase {
     readonly nodeType = AstNodeType.TagNode
     private readonly _startTag: StartTagNode
     private readonly _endTag?: EndTagNode | LinebreakNode
@@ -219,6 +219,16 @@ export class TagNode extends AstNode {
 
     get attributes(): Array<AttrNode> {
         return this._startTag.children as Array<AttrNode>
+    }
+
+    public getAttributesByName(): Record<string, string> {
+        const attrs: Record<string, string> = {}
+
+        for (const attrNode of this.attributes) {
+            attrs[attrNode.key] = attrNode.val
+        }
+
+        return attrs
     }
 
     get ogStartTag(): string {
@@ -266,13 +276,60 @@ export class TagNode extends AstNode {
 
         return s
     }
+
+    /**
+     * Gets the text of the immediate descendant of the current TagNode
+     *
+     * For example, would return "https://en.wikipedia.org/wiki/Markdown" for the following:
+     * ```bbcode
+     * [url]https://en.wikipedia.org/wiki/Markdown[/url]
+     * ```
+     */
+    public getTagImmediateText(this: TagNode): string | undefined {
+        if (this.children.length !== 1) {
+            return undefined
+        }
+
+        const child = this.children[0]
+        if (!nodeIsType(child, AstNodeType.RootNode)) {
+            return undefined
+        }
+
+        if (child.children.length !== 1) {
+            return undefined
+        }
+
+        const textNode = child.children[0]
+        if (!nodeIsType(textNode, AstNodeType.TextNode)) {
+            return undefined
+        }
+
+        return textNode.str
+    }
+
+    /**
+     * Gets the value of the immediate attribute of the current TagNode
+     *
+     * For example, would return "https://en.wikipedia.org/wiki/Markdown" for the following:
+     * ```bbcode
+     * [url=https://en.wikipedia.org/wiki/Markdown] Wikipedia's page on Markdown [/url]
+     * ```
+     */
+    public getTagImmediateAttrVal(this: TagNode): string | undefined {
+        if (this.attributes.length !== 1) {
+            return undefined
+        }
+
+        const attrNode = this.attributes[0]
+        return attrNode.val
+    }
 }
 
 // ----------------------------------------------------------------------------
 // Attr
 // ----------------------------------------------------------------------------
 
-export class AttrNode extends AstNode {
+export class AttrNode extends AstNodeBase {
     readonly nodeType = AstNodeType.AttrNode
 
     static readonly DEFAULT_KEY = 'default'
@@ -336,3 +393,5 @@ export class AttrNode extends AstNode {
         return s
     }
 }
+
+export type AstNode = RootNode | TextNode | LinebreakNode | TagNode | StartTagNode | EndTagNode | AttrNode

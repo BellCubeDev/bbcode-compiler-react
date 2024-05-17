@@ -1,17 +1,14 @@
-const dangerousUriRe = /^(vbscript|javascript|file|data):/
 const safeDataUriRe = /^data:image\/(gif|png|jpeg|webp);/
 
-export function isDangerousUrl(url: string): boolean {
-    const normalizedUrl = url.trim().toLowerCase()
-
-    if (!dangerousUriRe.test(normalizedUrl)) {
-        return false
+export function isDangerousUrl(url: URL): boolean {
+    switch (url.protocol) {
+        case 'http:':
+        case 'https:':
+        case 'mailto:':
+            return false
+        case 'data:':
+            return !safeDataUriRe.test(url.href)
+        default:
+            return true
     }
-
-    // Only a subset of data uris are considered safe
-    if (safeDataUriRe.test(normalizedUrl)) {
-        return false
-    }
-
-    return true
 }

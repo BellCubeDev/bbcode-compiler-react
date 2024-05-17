@@ -21,6 +21,8 @@
         "forceConsistentCasingInFileNames": true,
         "skipLibCheck": true,
 
+        "jsx": "react",
+
         "noUnusedLocals": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,

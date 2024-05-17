@@ -1,4 +1,4 @@
-import { htmlTransforms } from '../generator/transforms/htmlTransforms.js'
+import { defaultTransforms } from '../generator/transforms/defaultTransforms.js'
 import { stringifyTokens, Token } from '../lexer/Token.js'
 import { isStringToken, TokenType } from '../lexer/TokenType.js'
 import { RootNode, AttrNode, TextNode, LinebreakNode, StartTagNode, EndTagNode, AstNodeType, TagNode, AstNode } from './AstNode.js'
@@ -9,7 +9,7 @@ export class Parser {
     readonly linebreakTerminatedTags: Set<string>
     readonly standaloneTags: Set<string>
 
-    constructor(transforms = htmlTransforms) {
+    constructor(transforms = defaultTransforms) {
         this.tags = new Set(transforms.map((transform) => transform.name))
         this.linebreakTerminatedTags = new Set(transforms.filter((transform) => transform.isLinebreakTerminated).map((transform) => transform.name.toLowerCase()))
         this.standaloneTags = new Set(transforms.filter((transform) => transform.isStandalone).map((transform) => transform.name.toLowerCase()))
