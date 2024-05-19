@@ -9,7 +9,7 @@ import Yabbcode from 'ya-bbcode'
 import { generateHtml } from 'bbcode-compiler'
 import { generateReact } from '../../src/index.js'
 
-type BenchmarkRunner = {
+interface BenchmarkRunner {
     name: string
     run: (input: string) => React.ReactNode
 }

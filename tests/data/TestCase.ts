@@ -1,10 +1,10 @@
-export type ValidationTestCase = {
+export interface ValidationTestCase {
     name: string
     input: string
     expectedOutput: string
 }
 
-export type XssTestCase = {
+export interface XssTestCase {
     name: string
     input: string
     unexpectedSubstrings: Array<string>

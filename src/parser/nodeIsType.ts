@@ -1,6 +1,6 @@
 import { AstNodeType, AstNode, AttrNode, RootNode, TagNode, TextNode, LinebreakNode, EndTagNode, StartTagNode } from './AstNode.js'
 
-type AstMap = {
+interface AstMap {
     [AstNodeType.RootNode]: RootNode
     [AstNodeType.LinebreakNode]: LinebreakNode
     [AstNodeType.TextNode]: TextNode
