@@ -1,5 +1,5 @@
 declare module 'bbcode-parser' {
-    type BBTag = {
+    interface BBTag {
         createSimpleTag(tag: string): BBTag
     }
 

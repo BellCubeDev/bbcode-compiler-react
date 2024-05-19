@@ -97,7 +97,7 @@ module.exports = {
             ignoreParameters: false,
             ignoreProperties: true,
         }],
-        '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+        '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
         '@typescript-eslint/consistent-type-assertions': ['error', {
             assertionStyle: 'as',
             objectLiteralTypeAssertions: 'never',
@@ -115,48 +115,11 @@ module.exports = {
                 requireLast: false,
             },
         }],
-        '@typescript-eslint/strict-boolean-expressions': ['error', {
-            allowNullableBoolean: true,
-            allowNullableString: true,
-        }],
-        '@typescript-eslint/naming-convention': ['error',
-            {
-                selector: 'default',
-                format: null,
-                modifiers: ['requiresQuotes'],
-            },
-            {
-                selector: 'typeLike',
-                format: ['PascalCase'],
-            },
-            {
-                selector: 'parameter',
-                format: ['strictCamelCase', 'UPPER_CASE'],
-                leadingUnderscore: 'allowSingleOrDouble',
-                trailingUnderscore: 'allowDouble',
-            },
-            {
-                selector: 'memberLike',
-                modifiers: ['private'],
-                format: ['strictCamelCase'],
-                leadingUnderscore: 'require',
-            },
-            {
-                selector: [
-                    'variableLike',
-                    'method',
-                ],
-                filter: {
-                    regex: '^update:',
-                    match: false,
-                },
-                format: ['strictCamelCase', 'UPPER_CASE'],
-                leadingUnderscore: 'allowDouble',
-                trailingUnderscore: 'allowDouble',
-            },
-        ],
+        '@typescript-eslint/strict-boolean-expressions': 'off',
+        '@typescript-eslint/naming-convention': 'off', // I hate you sometimes, ESLint. I really do.
         '@typescript-eslint/no-unused-vars': ['error', {
             argsIgnorePattern: '^_',
         }],
+        '@typescript-eslint/no-unnecessary-type-arguments': 'off', // If I want to be explicit, I'm gonna be explicit!
     },
 }

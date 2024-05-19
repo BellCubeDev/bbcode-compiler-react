@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Generator, Transform, Lexer, getWidthHeightAttr, Parser, stringifyTokens, AstNodeType } from '@/index.js'
-import React from 'react';
-import { renderToString } from 'react-dom/server';
+import React from 'react'
+import { renderToString } from 'react-dom/server'
 
 const input = '[youtube]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/youtube]'
 const customTransforms: Array<Transform> = [
@@ -9,7 +9,7 @@ const customTransforms: Array<Transform> = [
         name: 'youtube',
         skipChildren: true,
 
-        component({ tagNode }) {
+        Component({ tagNode }) {
             const src = tagNode.getTagImmediateText()
             if (!src) {
                 return false
@@ -66,7 +66,7 @@ describe('Custom', () => {
             const root = new Parser(customTransforms).parse(input, tokens)
             const output = renderToString(new Generator(customTransforms).generate(root))
 
-            expect(output).toBe(`<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube Video Player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>`)
+            expect(output).toBe('<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube Video Player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>')
         })
     })
 })

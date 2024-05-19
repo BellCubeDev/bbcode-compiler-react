@@ -1,7 +1,7 @@
 import type { TagNode } from '../../parser/AstNode.js'
 import React from 'react'
 
-export type Transform = {
+interface TransformBase<TSkipChildren = false> {
     /**
      * The name of the tag. This is the string that appears between the square brackets in the BBCode.
      *
@@ -14,7 +14,7 @@ export type Transform = {
      *
      * Defaults to false.
      */
-    skipChildren?: boolean
+    skipChildren?: TSkipChildren
     /**
      * If true, this tag only has a starting tag (e.g. [hr] or [br]).
      *
@@ -35,11 +35,54 @@ export type Transform = {
      */
     isLinebreakTerminated?: boolean
 
-    /** React component that will be rendered when this tag is encountered */
-    component: ({ tagNode, children }: {
-        /** Tag node as parsed by the bbcode-compiler parser */
+    /** A React functional component that will be rendered when this tag is encountered
+     *
+     * If the raw text should be rendered (for example, if an image with a `javascript:` URL is encountered), you should call `doNotRenderBBCodeComponent()`.
+     *
+     * @param tagNode - The tag node as parsed by the bbcode-compiler parser
+     * @param children - The rendered React children, if applicable
+    */
+    Component: ({ tagNode, children }: {
+        /** The tag node as parsed by the bbcode-compiler parser */
         tagNode: TagNode
-        /** Rendered React children, if applicable */
-        children?: React.ReactNode
-    }) => React.ReactElement | false
+        /** The rendered React children for this tag */
+        children: never
+    }) => React.ReactNode
 }
+
+interface TransformSkipChildren extends TransformBase<true> {
+    skipChildren: true
+
+    /** A React functional component that will be rendered when this tag is encountered
+     *
+     * If the raw text should be rendered (for example, if an image with a `javascript:` URL is encountered), you should call `doNotRenderBBCodeComponent()`.
+     *
+     * @param tagNode - The tag node as parsed by the bbcode-compiler parser
+     * @param children - As this is a `skipChildren` tag, this will always be `undefined`.
+    */
+    Component: ({ tagNode, children }: {
+        /** The tag node as parsed by the bbcode-compiler parser */
+        tagNode: TagNode
+        /** As this is a `skipChildren` tag, this will always be `undefined`. */
+        children?: undefined
+    }) => React.ReactNode
+}
+
+interface TransformWithChildren extends TransformBase<false> {
+    skipChildren?: false
+    /** A React functional component that will be rendered when this tag is encountered
+     *
+     * If the raw text should be rendered (for example, if an image with a `javascript:` URL is encountered), you should call `doNotRenderBBCodeComponent()`.
+     *
+     * @param tagNode - The tag node as parsed by the bbcode-compiler parser
+     * @returns The rendered React component
+     */
+    Component: ({ tagNode, children }: {
+        /** The tag node as parsed by the bbcode-compiler parser */
+        tagNode: TagNode
+        /** The rendered React children for this tag */
+        children: Array<React.ReactNode>
+    }) => React.ReactNode
+}
+
+export type Transform = TransformSkipChildren | TransformWithChildren

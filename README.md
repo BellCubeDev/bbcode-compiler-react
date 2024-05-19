@@ -1,6 +1,6 @@
 # BBCode Compiler - React
 
-A fast BBCode parser and React generator with TypeScript support. Forked from [Trinovantes/bbcode-compiler](https://github.com/Trinovantes/bbcode-compiler).
+Parses BBCode and generates React components with strong TypeScript support. Forked from [Trinovantes/bbcode-compiler](https://github.com/Trinovantes/bbcode-compiler).
 
 **Note:** This package is a [Pure ESM package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
 
@@ -13,10 +13,18 @@ import { generateReact } from 'bbcode-compiler-react'
 const react = generateReact('[b]Hello World[/b]')
 ```
 
+<!--
+    TODO: Touch on API capabilities a bit more, such as:
+        * Built-in utils
+        * DoNotRenderBBCodeError
+        * Rendering performance & why you should use this anyway (~5x slower than bbcode-compiler)
+        * Graceful error handling
+-->
+
 ## Extending With Custom Tags
 
 ```tsx
-import { generateReact, defaultTransforms, getWidthHeightAttr } from 'bbcode-compiler-react'
+import { generateReact, defaultTransforms, getWidthHeightAttr, doNotRenderBBCodeComponent } from 'bbcode-compiler-react'
 
 const customTransforms: typeof defaultTransforms = [
     // Default tags included with this package
@@ -25,7 +33,7 @@ const customTransforms: typeof defaultTransforms = [
     // You can override a default tag by including it after the original in the transforms array
     {
         name: 'b',
-        component({ tagNode, children }) {
+        Component({ tagNode, children }) {
             return <b>
                 {children}
             </b>
@@ -33,20 +41,20 @@ const customTransforms: typeof defaultTransforms = [
     },
 
     // Create new tag
-    // You should read the TypeScript interface for TagNode in src/parser/AstNode.ts
+    // If you're writing an advanced tag, you may want to read the TypeScript interface for TagNode in src/parser/AstNode.ts
     // You can also use the included helper functions like getTagImmediateText and getWidthHeightAttr
     {
         name: 'youtube',
         skipChildren: true, // Do not actually render the "https://www.youtube.com/watch?v=dQw4w9WgXcQ" text
-        component({ tagNode, children }) {
+        Component({ tagNode, children }) { // Because we're in a `skipChildren` tag, TypeScript knows that `children` will always be `undefined`
             const src = tagNode.getTagImmediateText()
             if (!src) {
-                return false
+                return doNotRenderBBCodeComponent() // This method returns the type `never` which is as good as returning or throwing for TypeScript
             }
 
             const matches = /youtube.com\/watch\?v=(\w+)/.exec(src)
             if (!matches) {
-                return false
+                return doNotRenderBBCodeComponent()
             }
 
             const videoId = matches[1]

@@ -1,7 +1,7 @@
 {
     "name": "bbcode-compiler-react",
-    "version": "1.0.0",
-    "description": "Compiles BBCode into React components",
+    "version": "2.0.0",
+    "description": "Parses BBCode and generates React components with strong TypeScript support. Forked from Trinovantes/bbcode-compiler",
     "exports": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
