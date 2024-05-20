@@ -1,3 +1,7 @@
+# 2.0.1
+## Bug Fixes
+Actually export `doNotRenderBBCodeComponent()` from `index.ts` this time
+
 # 2.0.0
 ## Performance Impact
 For full transparency, this update does have roughly a roughly 15% hit to performance on paper. In practice, this is likely to be completely negligible (especially given more real-world workloads than Stephen Li [Trinovantes]'s built-in benchmarking), but it is worth noting for full transparency.
